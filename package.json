@@ -1,0 +1,26 @@
+{
+  "name": "NodeBlog",
+  "version": "1.0.0",
+  "description": "基于nodejs的博客后端平台",
+  "main": "bin/www.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js", 
+    "prd": "cross-env NODE_ENV=production nodemon ./bin/www.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tedqin/NodeBlog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tedqin/NodeBlog/issues"
+  },
+  "homepage": "https://github.com/tedqin/NodeBlog#readme",
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "nodemon": "^1.19.1"
+  }
+}
