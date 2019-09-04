@@ -1,4 +1,5 @@
 const querystring = require('querystring')
+const { get, set } = require('./src/db/redis')
 const handleBlogRouter = require('./src/router/blog')
 const handleUserRouter = require('./src/router/user')
 
@@ -8,8 +9,8 @@ const getCookieExpires = () => {
     return d.toGMTString()
 }
 
-//session数据
-const SESSION_DATA = {}
+// //session数据
+// const SESSION_DATA = {}
 
 const getPostData = (req) => {
     const promise = new Promise((resolve, reject) => {
@@ -63,22 +64,42 @@ const serverHandle = (req, res) => {
     })
     // console.log(req.cookie)
 
-    //解析session
-    let needSetCookie = false
+    // //解析session
+    // let needSetCookie = false
+    // let userId = req.cookie.userid
+    // if (userId) {
+    //     if (!SESSION_DATA[userId]) {
+    //         SESSION_DATA[userId] = {}
+    //     }
+    // } else {
+    //     needSetCookie = true
+    //     userId = `${Date.now()}_${Math.random()}`
+    //     SESSION_DATA[userId] = {}
+    // }
+    // req.session = SESSION_DATA[userId]
+
+    //解析session 使用redis
+    let needSetCookie = false 
     let userId = req.cookie.userid
-    if (userId) {
-        if (!SESSION_DATA[userId]) {
-            SESSION_DATA[userId] = {}
-        }
-    } else {
+    if (!userId) {
         needSetCookie = true
         userId = `${Date.now()}_${Math.random()}`
-        SESSION_DATA[userId] = {}
+        //初始化session
+        set(userId, {})
     }
-    req.session = SESSION_DATA[userId]
-
-    //处理postdata
-    getPostData(req).then(postData => {
+    //获取session
+    req.sessionId = userId
+    get(req.sessionId).then(sessionData => {
+        if (sessionData == null) {
+            set(req.sessionId, {})
+            req.session = {}
+        } else {
+            req.session = sessionData
+        }
+        //POST DATA
+        return getPostData(req)
+    })
+    .then(postData => {
         req.body = postData
 
         //处理blog路由
